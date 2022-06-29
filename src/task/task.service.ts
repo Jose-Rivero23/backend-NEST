@@ -1,26 +1,31 @@
 import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { iTask } from './models/task.model';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class TaskService {
-  create(createTaskDto: CreateTaskDto) {
-    return 'This action adds a new task';
+  constructor(@InjectModel('Task') private readonly Task: Model<iTask>) {} // inyectar el modelo
+
+  async create(createTaskDto: CreateTaskDto) {
+    return this.Task.create(createTaskDto);
   }
 
-  findAll() {
-    return `This action returns all task`;
+  async findAll() {
+    return this.Task.find({});
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} task`;
+  async findOne(id: string) {
+    return this.Task.findById(id);
   }
 
-  update(id: number, updateTaskDto: UpdateTaskDto) {
-    return `This action updates a #${id} task`;
+  update(id: string, updateTaskDto: UpdateTaskDto) {
+    return this.Task.findByIdAndUpdate(id, updateTaskDto, { new: true }); // el new:true es para devolver el cambio ya realizado
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} task`;
+  remove(id: string) {
+    return this.Task.findByIdAndDelete(id);
   }
 }
